@@ -1,0 +1,38 @@
+.initials {
+  position: relative;
+  top: 50px; 
+  font-size: 100px;
+  line-height: 100px; 
+  color: #fff;
+  font-weight: bold;
+}
+
+.defaultavatar {
+    height: 200px;
+    background: #aaa;
+    text-align: center;
+}
+
+
+.list-group > .list-group-item {
+  border-radius: 0;
+  border-width: 1px 0 0 0;
+}
+
+.list-group.list-group-flush {
+  border-bottom: 1px;
+}
+
+.list-group.list-group-flush .list-group {
+  margin-right: -20px;
+}
+
+
+.btn-link.btn-anchor {
+    outline: none !important;
+    padding: 0;
+    padding-right: 10px;
+    border: 0;
+    vertical-align: baseline;
+    font-size: 13px;
+}

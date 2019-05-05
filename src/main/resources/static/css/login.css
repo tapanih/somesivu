@@ -1,0 +1,38 @@
+html,
+body {
+  height: 100%;
+}
+
+body {
+  width: 50%; 
+  height: 50%;
+  min-width: 320px;
+  max-width: 400px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #f5f5f5;
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+}
+
+.form-signin {
+  width: 100%;
+  max-width: 320px;
+  margin: auto;
+}
+
+.form-signin input {
+  margin-bottom: 10px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.padding-0{
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+.label {
+    font-size: 10px;
+}

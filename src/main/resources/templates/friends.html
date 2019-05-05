@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fi" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/security/tags">
+    <head>
+        <title>Kaverit</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+        <link href="/css/messages.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="jumbotron text-center" style="margin-bottom:0">
+            <h1>Somesivu</h1>
+        </div>
+
+        <nav class="navbar navbar-expand-md navbar-light bg-light">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul th:if="${profileId != null}" class="navbar-nav mr-auto">
+                    <form method="POST" th:action="@{/logout}" action="/logout">
+                        <li class="nav-item">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Kirjaudu ulos</button>
+                        </li> 
+                    </form>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/profile/} + ${profileId}">Seinä</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/gallery/} + ${profileId}">Kuva-albumi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/friends}">Kaverit</a>
+                    </li>  
+
+                </ul>
+                <ul th:unless="${profileId != null}" class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/login}">Kirjaudu sisään</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/register}">Rekisteröidy</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0" method="GET" th:action="@{/search}" action="/search">
+                    <input class="form-control mr-sm-2" name="name" type="text" placeholder="Nimi" aria-label="Etsi käyttäjiä">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Etsi käyttäjiä</button>
+                </form>
+            </div>  
+        </nav>
+
+        <div class="container" style="margin-top:30px">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Vastaanotetut kaveripyynnöt</h2>
+                    <p th:if="${received == null or received.empty}">Tyhjää täynnä</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" th:each="request : ${received}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1" th:text="${request.sender.name} + ' haluaa lisätä sinut kaveriksi'">Nimi</h5>
+                                <small th:text="${#temporals.format(request.datetime, 'dd-MM-yyyy HH:mm')}">Päivämäärä</small>
+                            </div>
+                            <div class="d-flex w-100">
+                                <form sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/friendrequest/accept/{id}(id=${request.id})}" action="/friendrequest/accept">
+                                    <button type="submit" class="btn btn-link btn-anchor">hyväksy</button>
+                                </form>
+                                <form sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/friendrequest/decline/{id}(id=${request.id})}" action="/friendrequest/decline">
+                                    <button type="submit" class="btn btn-link btn-anchor">hylkää</button>
+                                </form>
+                                <a class="btn-link btn-anchor" style="margin-top: 3px" th:href="@{/profile/} + ${request.sender.profile.id}">näytä profiili</a>
+                            </div>
+                        </li>
+                    </ul>
+                    <h2>Lähetetyt kaveripyynnöt</h2>
+                    <p th:if="${sent == null or sent.empty}">Tyhjää täynnä</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" th:each="request : ${sent}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1" th:text="${request.recipient.name}">Nimi</h5>
+                                <small th:text="${#temporals.format(request.datetime, 'dd-MM-yyyy HH:mm')}">Päivämäärä</small>
+                            </div>
+                            <div class="d-flex w-100">
+                                <a class="btn-link btn-anchor" style="margin-top: 3px" th:href="@{/profile/} + ${request.recipient.profile.id}">näytä profiili</a>
+                            </div>
+                        </li>
+                    </ul>
+                    <h2>Kaverit</h2>
+                    <p th:if="${friends == null or friends.empty}">Tyhjää täynnä :(</p>
+                    <ul class="list-group list-group-flush">
+
+                        <li class="list-group-item" th:each="friend : ${friends}">
+                            <h5 class="mb-1" th:text="${friend.name}">Nimi</h5>
+                            <div class="d-flex w-100">
+                                <a class="btn-link btn-anchor" style="margin-top: 3px" th:href="@{/profile/} + ${friend.profile.id}">näytä profiili</a>
+                            </div>
+                        </li>
+                    </ul>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="jumbotron text-center" style="margin-bottom:0">
+        </div>

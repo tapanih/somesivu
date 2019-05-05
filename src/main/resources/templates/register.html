@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fi" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link href="/css/login.css" rel="stylesheet">
+        <title>Rekisteröidy</title>
+    </head>
+    <body onload="inputListener()">
+        <div class="col-xs-1 text-center">
+            <form class="form-signin" th:object="${accountForm}" th:action="@{/register}" method="POST">
+                <div class="alert alert-danger" th:if="${#fields.hasErrors('*')}">
+                    <p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>    
+                </div>
+                <h1 class="h3 mb-3 font-weight-normal">Luo tili</h1>
+                <input type="text" id="inputUsername" th:field="*{username}" class="form-control" placeholder="Käyttäjätunnus" required autofocus>
+                <input type="password" id="inputPassword" th:field="*{password}" class="form-control" placeholder="Salasana" required>
+                <input type="password" id="inputConfirmation" th:field="*{confirmation}" class="form-control" placeholder="Salasana uudelleen" required>
+                <input type="text" id="inputName" th:field="*{name}" class="form-control" placeholder="Nimi" required>
+                <label for="inputProfile" id="profileLabel">profiilin-osoite</label>
+                <script>
+                    function inputListener() {
+                        var polku = document.getElementById("inputProfile").value
+                        document.getElementById("profileLabel").innerHTML = window.location.protocol + "//" + window.location.host + "/profile/" + polku
+                    }
+                </script>
+                <input type="text" oninput="inputListener()" id="inputProfile" th:field="*{profile}" class="form-control" placeholder="profiilin-osoite" required>
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Rekisteröidy</button>
+            </form>
+            <p>Onko sinulla jo tili? <a th:href="@{login/}">Kirjaudu sisään.</a></p>
+        </div>
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    </body>
+</html>

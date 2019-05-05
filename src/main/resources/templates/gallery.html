@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fi" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/security/tags">
+    <head>
+        <title>Kuva-galleria</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+        <link href="/css/messages.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="jumbotron text-center" style="margin-bottom:0">
+            <h1>Somesivu</h1>
+        </div>
+
+        <nav class="navbar navbar-expand-md navbar-light bg-light">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+                <ul th:if="${profileId != null}" class="navbar-nav mr-auto">
+                    <form method="POST" th:action="@{/logout}" action="/logout">
+                        <li class="nav-item">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Kirjaudu ulos</button>
+                        </li> 
+                    </form>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/profile/} + ${profileId}">Seinä</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/gallery/} + ${profileId}">Kuva-albumi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/friends}">Kaverit</a>
+                    </li>  
+
+                </ul>
+                <ul th:unless="${profileId != null}" class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/login}">Kirjaudu sisään</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/register}">Rekisteröidy</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Nimi" aria-label="Etsi käyttäjiä">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Etsi käyttäjiä</button>
+                </form>
+            </div>  
+        </nav>
+
+        <div class="container" style="margin-top:30px">
+            <div class="row">
+                <div class="col-md-3"> 
+                    <div th:if="${avatarId == null}" class="defaultavatar">
+                        <p class="initials">?</p>
+                    </div>
+                    <img th:unless="${avatarId == null}" class="img-fluid" th:src="@{/gallery/image/{id}(id=${avatarId})}"/>
+                    <h5 th:text="${gallery.owner.name}">nimi</h5>
+                    <form th:unless="${isFriend} or ${isOwner}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/friendrequest/{id}(id=${gallery.owner.id})}" action="/friendrequest">
+                        <button type="submit" class="btn btn-link">Lähetä kaveripyyntö</button>
+                    </form>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/profile/} + ${gallery.profileId}">Seinä</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/gallery/} + ${gallery.profileId}">Kuva-albumi</a>
+                        </li>
+                    </ul>
+                    <hr class="d-sm-none">
+                </div>
+                <div class="col-md-9">
+                    <h2>Kuva-albumi</h2>
+                    <div class="mdb-lightbox no-margin">
+                        <figure class="col-sm-9" th:each="image, iter : ${images}">
+                            <img class="img-fluid" th:src="@{/gallery/image/{id}(id=${image.id})}"/>
+
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1" th:text="${gallery.owner.name}">Lähettäjä</h5>
+                                <small th:text="${#temporals.format(image.datetime, 'dd-MM-yyyy HH:mm')}">Päivämäärä</small>
+                            </div>
+                            <p class="mb-1" th:text="${image.description}">Viesti</p>
+                            <div class="d-flex w-100">
+                                <form th:if="${isOwner}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/gallery/avatar/{id}(id=${image.id})}" action="/image/avatar">
+                                    <button type="submit" class="btn btn-link btn-anchor">aseta profiilikuvaksi</button>
+                                </form>
+                                <form th:if="${isOwner}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/gallery/delete/{id}(id=${image.id})}" action="/image/delete">
+                                    <button type="submit" class="btn btn-link btn-anchor">poista</button>
+                                </form>
+                                <form th:if="${isFriend}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/gallery/image/like/{id}(id=${image.id})}" action="/image/like">
+                                    <button type="submit" class="btn btn-link btn-anchor">tykkää</button>
+                                </form>
+                                <button th:if="${isFriend or isOwner}" class="btn btn-link btn-anchor" type="button" data-toggle="collapse" th:href="'#replyMessage' + ${image.id}">vastaa</button>
+                                <span class="text-success ml-auto" th:text="'+' + ${image.numberOfLikes}">0</span>
+                            </div>
+                            <div class="collapse" th:id="'replyMessage' + ${image.id}" style="margin-top:20px">
+                                <form th:if="${isFriend or isOwner}" class="form-group" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/gallery/comment/{id}(id=${image.id})}" action="/gallery/comment">
+                                    <textarea class="form-control" name="content" rows="3"></textarea>
+                                    <button class="btn btn-default" type="submit">Lähetä vastaus</button>
+                                </form>
+                            </div>
+                            <ul style="margin-right: -20px" class="list-group">
+                                <li class="list-group-item" th:each="comment : ${comments[iter.index]}">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1" th:text="${comment.sender.name}">Lähettäjä</h5>
+                                        <small th:text="${#temporals.format(comment.datetime, 'dd-MM-yyyy HH:mm')}">Päivämäärä</small>
+                                    </div>
+
+                                    <p class="mb-1" th:text="${comment.content}">Viesti</p>
+                                    <div class="d-flex w-100">
+                                        <form th:if="${isFriend}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/gallery/{galleryId}/comment/like/{commentId}(galleryId=${gallery.profileId},commentId=${comment.id})}" action="/comment/like">
+                                            <button type="submit" class="btn btn-link btn-anchor">tykkää</button>
+                                        </form>
+                                        <span class="text-success ml-auto" th:text="'+' + ${comment.numberOfLikes}">0</span>
+                                    </div>
+                                </li> 
+                            </ul>
+                        </figure>
+
+                    </div>
+                    <form th:if="${isOwner}" method="POST" th:action="@{/gallery/} + ${gallery.profileId}" enctype="multipart/form-data">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroupFileAddon01">Lataa</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" name="file" id="file" class="custom-file-input"
+                                       aria-describedby="inputGroupFileAddon01">
+                                    <label class="custom-file-label" for="inputGroupFile01" data-browse="Selaa">Valitse tiedosto...</label>
+                            </div>
+                        </div>
+
+                        <label class="mt-3" for="descriptionTextarea">Kuvaus:</label>
+                        <textarea class="form-control" id="descriptionTextarea" name="description" rows="3"></textarea>
+                        <button class="btn btn-primary" type="submit">Lisää kuva</button>
+
+                    </form> 
+                </div>
+
+            </div>
+        </div>
+
+        <div class="jumbotron text-center" style="margin-bottom:0">
+        </div>
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script type="application/javascript">
+            $('input[type="file"]').change(function(e){
+                var fileName = e.target.files[0].name;
+                $('.custom-file-label').html(fileName);
+            });
+        </script>
+    </body>
+</html>
