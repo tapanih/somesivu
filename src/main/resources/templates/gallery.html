@@ -44,8 +44,8 @@
                         <a class="nav-link" th:href="@{/register}">Rekisteröidy</a>
                     </li>
                 </ul>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Nimi" aria-label="Etsi käyttäjiä">
+                <form class="form-inline my-2 my-lg-0" method="GET" th:action="@{/search}" action="/search">
+                    <input class="form-control mr-sm-2" name="name" type="text" placeholder="Nimi" aria-label="Etsi käyttäjiä">
                         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Etsi käyttäjiä</button>
                 </form>
             </div>  
