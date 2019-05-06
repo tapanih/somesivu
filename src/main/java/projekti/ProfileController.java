@@ -47,8 +47,14 @@ public class ProfileController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Account account = accountService.findAuthenticatedAccount(auth.getName());
         Profile profile = profileRepository.findById(profileId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profiilia ei löytynyt"));
-        model.addAttribute("profileId", account.getProfile().getId());
-        model.addAttribute("isFriend", account.getFriends().contains(profile.getOwner()));
+        if (account != null) {
+            model.addAttribute("profileId", account.getProfile().getId());
+            model.addAttribute("isFriend", account.getFriends().contains(profile.getOwner()));
+        } else {
+            model.addAttribute("profileId", null);
+            model.addAttribute("isFriend", false);
+        }
+
         model.addAttribute("isOwner", accountService.isOwnerOfProfile(account, profileId));
         Pageable pageableMessages = PageRequest.of(0, 25, Sort.by("datetime").descending());
         List<Message> messages = messageRepository.findByProfileId(profileId, pageableMessages);

@@ -82,7 +82,7 @@
 
                             <p class="mb-1" th:text="${message.content}">Viesti</p>
                             <div class="d-flex w-100">
-                                <form th:if="${isFriend}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/profile/message/like/} + ${message.id}" action="/message/like">
+                                <form th:if="${isFriend} or ${isOwner}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/profile/message/like/} + ${message.id}" action="/message/like">
                                     <button type="submit" class="btn btn-link btn-anchor">tykkää</button>
                                 </form>
                                 <button th:if="${isFriend} or ${isOwner}" class="btn btn-link btn-anchor" type="button" data-toggle="collapse" th:href="'#replyMessage' + ${message.id}">vastaa</button>
@@ -103,7 +103,7 @@
                                     
                                         <p class="mb-1" th:text="${reply.content}">Viesti</p>
                                         <div class="d-flex w-100">
-                                        <form th:if="${isFriend}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/profile/reply/like/} + ${reply.id}" action="/reply/like">
+                                        <form th:if="${isFriend} or ${isOwner}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/profile/reply/like/} + ${reply.id}" action="/reply/like">
                                             <button type="submit" class="btn btn-link btn-anchor">tykkää</button>
                                         </form>
                                         <span class="text-success ml-auto" th:text="'+' + ${reply.numberOfLikes}">0</span>
@@ -114,8 +114,8 @@
                         </li>                            
                     </ul> 
 
-                    <form th:if="${isFriend} or ${isOwner}" class="form-group" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/profile/message/} + ${profile.id}" action="/profile/message">
-                        <textarea class="form-control" name="content" rows="3"></textarea>
+                    <form id="newMessageForm" th:if="${isFriend} or ${isOwner}" class="form-group" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/profile/message/} + ${profile.id}" action="/profile/message">
+                        <textarea id="newMessageTextarea" class="form-control" name="content" rows="3"></textarea>
                         <button class="btn btn-primary" type="submit">Lähetä viesti</button>
                     </form>          
                 </div>

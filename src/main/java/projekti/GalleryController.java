@@ -45,16 +45,17 @@ public class GalleryController {
     public String getGallery(Model model, @PathVariable String galleryId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Account account = accountService.findAuthenticatedAccount(auth.getName());
+        Gallery gallery = galleryRepository.findByProfileId(galleryId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kuva-galleriaa ei löytynyt"));  
         
         if (account != null) {
             model.addAttribute("profileId", account.getProfile().getId());
+            model.addAttribute("isFriend", account.getFriends().contains(gallery.getOwner()));
         } else {
             model.addAttribute("profileId", null);
+            model.addAttribute("isFriend", false);
         }
 
         model.addAttribute("isOwner", accountService.isOwnerOfGallery(account, galleryId));
-        Gallery gallery = galleryRepository.findByProfileId(galleryId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kuva-galleriaa ei löytynyt"));  
-        model.addAttribute("isFriend", account.getFriends().contains(gallery.getOwner()));
         model.addAttribute("avatarId", gallery.getOwner().getAvatarId());
         model.addAttribute("gallery", gallery);
         Pageable pageable = PageRequest.of(0, 10, Sort.by("datetime").descending());

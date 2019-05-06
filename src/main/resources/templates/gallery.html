@@ -90,7 +90,7 @@
                                 <form th:if="${isOwner}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/gallery/delete/{id}(id=${image.id})}" action="/image/delete">
                                     <button type="submit" class="btn btn-link btn-anchor">poista</button>
                                 </form>
-                                <form th:if="${isFriend}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/gallery/image/like/{id}(id=${image.id})}" action="/image/like">
+                                <form th:if="${isFriend or isOwner}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/gallery/image/like/{id}(id=${image.id})}" action="/image/like">
                                     <button type="submit" class="btn btn-link btn-anchor">tykkää</button>
                                 </form>
                                 <button th:if="${isFriend or isOwner}" class="btn btn-link btn-anchor" type="button" data-toggle="collapse" th:href="'#replyMessage' + ${image.id}">vastaa</button>
@@ -111,7 +111,7 @@
 
                                     <p class="mb-1" th:text="${comment.content}">Viesti</p>
                                     <div class="d-flex w-100">
-                                        <form th:if="${isFriend}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/gallery/{galleryId}/comment/like/{commentId}(galleryId=${gallery.profileId},commentId=${comment.id})}" action="/comment/like">
+                                        <form th:if="${isFriend or isOwner}" sec:authorize="hasAuthority('ROLE_POSTER')" method="POST" th:action="@{/gallery/{galleryId}/comment/like/{commentId}(galleryId=${gallery.profileId},commentId=${comment.id})}" action="/comment/like">
                                             <button type="submit" class="btn btn-link btn-anchor">tykkää</button>
                                         </form>
                                         <span class="text-success ml-auto" th:text="'+' + ${comment.numberOfLikes}">0</span>
